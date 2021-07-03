@@ -23,7 +23,7 @@ enum
 	PRINT_COLOR_WHITE = 15,
 };
 
-void print_clear();
-void print_char(char character);
-void print_str(char* string);
-void print_set_color(uint8_t foreground, uint8_t background);
+void cleardisplay();
+void displaycharacter(char character);
+void diaplystring(char* string);
+void setdisplaycolor(uint8_t foreground, uint8_t background);

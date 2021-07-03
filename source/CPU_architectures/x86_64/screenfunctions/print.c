@@ -1,5 +1,6 @@
 #include "print.h"
-void clear_row(); /* push-ahead */
+void clearrow(); /* push-ahead */
+void clearbyrow();
 
 const static size_t Column_Sum = 80;
 const static size_t Row_Sum = 25;
@@ -24,13 +25,11 @@ struct Char characterdefault;
 *
 */
 
-void print_clear() {
-    for (int i = 0; i < Row_Sum; i++) {
-        clear_row(i);
-    }
+void cleardisplay() {
+    clearbyrow();
 }
 
-void clear_row(int row) 
+void clearrow(int row) 
 {
     characterdefault.character = ' ';
     characterdefault.color = color;
@@ -40,7 +39,13 @@ void clear_row(int row)
     }
 }
 
-void print_newline() {
+void clearbyrow() {
+    for (int i = 0; i < Row_Sum; i++) {
+    clearrow(i);
+    }
+}
+
+void newline() {
     col = 0;
     struct Char characterswitch;
 
@@ -56,17 +61,17 @@ void print_newline() {
         }
     }
 
-    clear_row(Column_Sum - 1);
+    clearrow(Column_Sum - 1);
 }
 
-void print_char(char character) {
+void displaycharacter(char character) {
     if (character == '\n') {
-        print_newline();
+        newline();
         return;
     }
 
     if (col > Column_Sum) {
-        print_newline();
+        newline();
     }
 
     displaybuffer[col + Column_Sum * row] = (struct Char) {
@@ -77,7 +82,7 @@ void print_char(char character) {
     col++;
 }
 
-void print_str(char* str) {
+void displaystring(char* str) {
     for (size_t i = 0; 1; i++) {
         char character = (uint8_t) str[i];
 
@@ -85,11 +90,11 @@ void print_str(char* str) {
             return;
         }
 
-        print_char(character);
+        displaycharacter(character);
     }
 }
 
-void print_set_color(uint8_t foreground, uint8_t background)
+void setdisplaycolor(uint8_t foreground, uint8_t background)
 {
     color = foreground + (background << 4); /* foreground and background fit into 1 byte */
 }
