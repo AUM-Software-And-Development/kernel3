@@ -1,51 +1,62 @@
 #include "print.h"
+void clear_row(); /* push-ahead */
 
-const static size_t NUM_COLS = 80;
-const static size_t NUM_ROWS = 25;
+const static size_t Column_Sum = 80;
+const static size_t Row_Sum = 25;
+
+int8_t color = PRINT_COLOR_WHITE | PRINT_COLOR_DARK_GRAY << 4; /* default color palet */
+
+struct Char* displaybuffer = (struct Char*) 0xb8000;
 
 struct Char {
     uint8_t character;
     uint8_t color;
 };
 
-struct Char* buffer = (struct Char*) 0xb8000;
 size_t col = 0;
 size_t row = 0;
-uint8_t color = PRINT_COLOR_WHITE | PRINT_COLOR_DARK_GRAY << 4;
 
-void clear_row(size_t row) {
-    struct Char empty = (struct Char) {
-        character: ' ',
-        color: color,
-    };
+/* Declaring delegates */
 
-    for (size_t col = 0; col < NUM_COLS; col++) {
-        buffer[col + NUM_COLS * row] = empty;
+struct Char characterdefault;
+
+/*
+*
+*/
+
+void print_clear() {
+    for (int i = 0; i < Row_Sum; i++) {
+        clear_row(i);
     }
 }
 
-void print_clear() {
-    for (size_t i = 0; i < NUM_ROWS; i++) {
-        clear_row(i);
+void clear_row(int row) 
+{
+    characterdefault.character = ' ';
+    characterdefault.color = color;
+
+    for (int col = 0; col < Column_Sum; col++) {
+        displaybuffer[col + Column_Sum * row] = characterdefault;
     }
 }
 
 void print_newline() {
     col = 0;
+    struct Char characterswitch;
 
-    if (row < NUM_ROWS - 1) {
+    if (row < Row_Sum - 1) {
         row++;
         return;
     }
 
-    for (size_t row = 1; row < NUM_ROWS; row++) {
-        for (size_t col = 0; col < NUM_COLS; col++) {
-            struct Char character = buffer[col + NUM_COLS * row];
-            buffer[col + NUM_COLS * (row - 1)] = character;
+    for (int row = 1; row < Row_Sum; row++) {
+        for (int col = 0; col < Column_Sum; col++) {
+            characterswitch = displaybuffer[col + Column_Sum * row];
+            displaybuffer[col + Column_Sum * (row - 1)] = characterswitch;
         }
     }
 
-    clear_row(NUM_COLS - 1);
+    clear_row(Column_Sum - 1);
 }
 
 void print_char(char character) {
@@ -54,11 +65,11 @@ void print_char(char character) {
         return;
     }
 
-    if (col > NUM_COLS) {
+    if (col > Column_Sum) {
         print_newline();
     }
 
-    buffer[col + NUM_COLS * row] = (struct Char) {
+    displaybuffer[col + Column_Sum * row] = (struct Char) {
         character: (uint8_t) character,
         color: color,
     };
