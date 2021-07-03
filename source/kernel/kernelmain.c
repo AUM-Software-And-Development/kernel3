@@ -1,4 +1,4 @@
-#include "print.h"
+#include "display.h"
 
 void kernel_main()
 {
